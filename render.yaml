@@ -46,7 +46,7 @@ services:
     region: frankfurt
     plan: 2c-4g
     image:
-      url: ghcr.io/vasily-piksis/flow-steward-compact@sha256:0a9da5d83a70c67e81c1477c100327ce9aeadf37267a0d7f7f27ba0ae4320828
+      url: ghcr.io/vasily-piksis/flow-steward-compact@sha256:ae36f5d5ff1da4ef343ac3a5fa9a5c65ccf0a0b61ccb4f882872fd7da8491e8e
     healthCheckPath: /health/ready
     # A user's one-click installation must not redeploy on every upstream push.
     autoDeployTrigger: 'off'
