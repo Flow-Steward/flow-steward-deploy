@@ -1,6 +1,6 @@
 # Flow Steward deployment configuration
 
-This repository contains the Render Blueprint for a fresh Flow Steward Compact installation. It does not build or fork the application image: `render.yaml` pulls the same public [Flow Steward Compact image](https://github.com/vasily-piksis/agentic-team/pkgs/container/flow-steward-compact) used by other platforms, pinned to a tested digest.
+This repository contains the Render Blueprint for a fresh Flow Steward Compact installation. It does not build or fork the application image: `render.yaml` pulls from the same public [Flow Steward Compact image repository](https://github.com/vasily-piksis/agentic-team/pkgs/container/flow-steward-compact) used by other platforms, pinned to a tested digest.
 
 Render creates one Compact web service, a private PostgreSQL service with the required extensions, a private RabbitMQ service, and their persistent disks. The services are paid; review Render's estimate before deploying. The application waits for PostgreSQL and RabbitMQ to accept connections before initialization.
 
