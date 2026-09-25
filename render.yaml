@@ -1,0 +1,118 @@
+# Fresh Flow Steward Compact installation. Render pulls the same public Compact
+# image used by other platforms; this file defines only Render services and
+# their settings. Compact waits for both backing protocols before touching /data.
+services:
+  - type: pserv
+    name: flow-steward-postgres
+    runtime: image
+    region: frankfurt
+    plan: 1c-2g
+    image:
+      url: ghcr.io/vasily-piksis/fs-postgres-extended@sha256:47a10afb648b55a29e0422f7944a5eb8f12f99f4fecfbb5a2af721fe42196ce8
+    disk:
+      name: postgres-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 10
+    envVars:
+      - key: PGDATA
+        value: /var/lib/postgresql/data/pgdata
+      - key: POSTGRES_DB
+        value: flow_steward
+      - key: POSTGRES_USER
+        value: flow_steward
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+
+  - type: pserv
+    name: flow-steward-rabbitmq
+    runtime: image
+    region: frankfurt
+    plan: 1c-2g
+    image:
+      url: rabbitmq@sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69
+    disk:
+      name: rabbitmq-data
+      mountPath: /var/lib/rabbitmq
+      sizeGB: 1
+    envVars:
+      - key: RABBITMQ_DEFAULT_USER
+        value: flow_steward
+      - key: RABBITMQ_DEFAULT_PASS
+        generateValue: true
+
+  - type: web
+    name: flow-steward-compact
+    runtime: image
+    region: frankfurt
+    plan: 2c-4g
+    image:
+      url: ghcr.io/vasily-piksis/flow-steward-compact@sha256:a623a5f77a5e55434cdef34d8b4ff1ab21b50c5a1f1dd264fa78dcf352592c27
+    healthCheckPath: /health/ready
+    # A user's one-click installation must not redeploy on every upstream push.
+    autoDeployTrigger: 'off'
+    numInstances: 1
+    disk:
+      name: compact-data
+      mountPath: /data
+      sizeGB: 10
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: FS_COMPACT_ADOPT_EMPTY_VOLUME
+        value: "1"
+      - key: FS_COMPACT_WAIT_FOR_DEPENDENCIES
+        value: "1"
+      - key: FS_COMPACT_STARTUP_TIMEOUT_SECONDS
+        value: "600"
+      # Render does not allow maxShutdownDelaySeconds on a disk-backed service.
+      # Leave five seconds inside its fixed 30-second termination window.
+      - key: FS_COMPACT_SHUTDOWN_GRACE_SECONDS
+        value: "25"
+      - key: FS_COMPACT_KILL_RESERVE_SECONDS
+        value: "5"
+      - key: FS_WORKER_PROCESSES
+        value: "2"
+      - key: APP_WORKERS
+        value: "1"
+      - key: ENVIRONMENT
+        value: production
+      - key: FS_STACK_ENVIRONMENT
+        value: production
+      - key: ARTIFACT_STORAGE_BACKEND
+        value: local_fs
+      - key: POSTGRES_DB
+        value: flow_steward
+      - key: POSTGRES_USER
+        value: flow_steward
+      - key: POSTGRES_HOST
+        fromService:
+          name: flow-steward-postgres
+          type: pserv
+          property: host
+      - key: POSTGRES_PASSWORD
+        fromService:
+          name: flow-steward-postgres
+          type: pserv
+          envVarKey: POSTGRES_PASSWORD
+      - key: RABBITMQ_USER
+        value: flow_steward
+      - key: RABBITMQ_HOST
+        fromService:
+          name: flow-steward-rabbitmq
+          type: pserv
+          property: host
+      - key: RABBITMQ_PASS
+        fromService:
+          name: flow-steward-rabbitmq
+          type: pserv
+          envVarKey: RABBITMQ_DEFAULT_PASS
+      - key: FS_PUBLIC_BASE_URL
+        fromService:
+          name: flow-steward-compact
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: FS_AUTH_TRUSTED_ORIGINS
+        fromService:
+          name: flow-steward-compact
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
