@@ -11,9 +11,28 @@ passed a fresh Railway installation and restart check.
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https%3A%2F%2Fgithub.com%2FFlow-Steward%2Fflow-steward-deploy)
 
-See the [installation guide](https://flow-steward.github.io/documentation-site/docs/deploy/render) for
-plans, first-administrator access, console commands, and operational limits.
 This single-instance disk-backed configuration has downtime during replacement;
 the check does not certify AI-provider execution or backup/restore.
 
 After the web service is Live, open its logs and use the one-time first-admin URL printed there. The Blueprint is for a **new** installation; it is not an upgrade or migration tool.
+
+The setup URL expires after 15 minutes. If it expires while no administrator
+exists, restart only Compact and read its fresh logs. Keep all three disks.
+In **flow-steward-compact → Shell**, run administrative commands directly:
+
+```bash
+flow-steward users list
+flow-steward status
+flow-steward users create --role admin
+```
+
+The last command is an alternative first-administrator path; enter the email
+and password interactively. No Git checkout or manual secret export is needed.
+The application is under `/app`, and persistent files are under `/data`.
+
+The tested plans total $140.25/month before traffic overages or taxes:
+Compact 2 vCPU/4 GB + 10 GB disk, PostgreSQL 1 vCPU/2 GB + 10 GB disk,
+RabbitMQ 1 vCPU/2 GB + 1 GB disk. This is a tested configuration, not a
+measured minimum. Confirm Render's current estimate before deploying.
+PostgreSQL uses our extension-enabled image, not Render managed PostgreSQL;
+arrange backups for PostgreSQL, RabbitMQ and `/data` before storing real data.
