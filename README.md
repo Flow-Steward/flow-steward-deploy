@@ -4,7 +4,16 @@ This repository contains the Render Blueprint for a fresh Flow Steward Compact i
 
 Render creates one Compact web service, a private PostgreSQL service with the required extensions, a private RabbitMQ service, and their persistent disks. The services are paid; review Render's estimate before deploying. The application waits for PostgreSQL and RabbitMQ to accept connections before initialization.
 
-The Blueprint is being verified on Render. Its one-click installation link will
-be published here after a fresh Render deployment passes acceptance.
+Fresh Blueprint installation was checked on Render on 2026-09-26: readiness,
+first-administrator setup, browser login, CLI administration, graceful shutdown,
+and user/session/file persistence after restart. The same Compact image also
+passed a fresh Railway installation and restart check.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https%3A%2F%2Fgithub.com%2FFlow-Steward%2Fflow-steward-deploy)
+
+See the [installation guide](https://flow-steward.github.io/documentation-site/docs/deploy/render) for
+plans, first-administrator access, console commands, and operational limits.
+This single-instance disk-backed configuration has downtime during replacement;
+the check does not certify AI-provider execution or backup/restore.
 
 After the web service is Live, open its logs and use the one-time first-admin URL printed there. The Blueprint is for a **new** installation; it is not an upgrade or migration tool.
