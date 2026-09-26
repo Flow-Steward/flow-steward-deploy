@@ -1,6 +1,13 @@
 # Flow Steward deployment configuration
 
-This repository contains Render and Elestio configuration for fresh Flow Steward Compact installations. Both pull from the same public [Flow Steward Compact image repository](https://github.com/vasily-piksis/agentic-team/pkgs/container/flow-steward-compact), pinned to a tested digest. They do not build or fork the application image.
+This repository contains Render, Elestio and Fly.io configuration for fresh Flow Steward Compact installations. All pull from the same public [Flow Steward Compact image repository](https://github.com/vasily-piksis/agentic-team/pkgs/container/flow-steward-compact), pinned to a tested digest. They do not build or fork the application image.
+
+## Fly.io
+
+The [Fly.io installation guide](fly/README.md) includes three TOML files for
+Compact, PostgreSQL and RabbitMQ, sequential startup commands, persistent
+volumes, HTTPS, and access to the built-in administrative CLI. Use a paid
+account for a persistent installation; trial Machines stop after five minutes.
 
 ## Render
 

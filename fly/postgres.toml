@@ -1,0 +1,32 @@
+app = 'your-fs-demo-pg'
+primary_region = 'fra'
+kill_signal = 'SIGINT'
+kill_timeout = 60
+
+[build]
+image = 'ghcr.io/vasily-piksis/fs-postgres-extended@sha256:47a10afb648b55a29e0422f7944a5eb8f12f99f4fecfbb5a2af721fe42196ce8'
+
+[env]
+PGDATA = '/var/lib/postgresql/data/pgdata'
+POSTGRES_DB = 'flow_steward'
+POSTGRES_USER = 'flow_steward'
+
+[[mounts]]
+source = 'postgres_data'
+destination = '/var/lib/postgresql/data'
+
+[[vm]]
+cpu_kind = 'shared'
+cpus = 1
+memory = '2gb'
+
+[[restart]]
+policy = 'on-failure'
+retries = 3
+
+[checks.postgres]
+type = 'tcp'
+port = 5432
+grace_period = '30s'
+interval = '15s'
+timeout = '5s'

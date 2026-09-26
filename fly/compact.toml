@@ -1,0 +1,54 @@
+app = 'your-fs-demo-compact'
+primary_region = 'fra'
+kill_signal = 'SIGTERM'
+kill_timeout = 180
+
+[build]
+image = 'ghcr.io/vasily-piksis/flow-steward-compact@sha256:e41f179da299904b02cd60cb8b50d73e20f7fcf9f384a5bbc8edd17c8bfcf214'
+
+[env]
+PORT = '8080'
+ENVIRONMENT = 'production'
+FS_STACK_ENVIRONMENT = 'production'
+FS_COMPACT_ADOPT_EMPTY_VOLUME = '1'
+FS_COMPACT_WAIT_FOR_DEPENDENCIES = '1'
+FS_COMPACT_STARTUP_TIMEOUT_SECONDS = '600'
+FS_COMPACT_SHUTDOWN_GRACE_SECONDS = '150'
+FS_COMPACT_KILL_RESERVE_SECONDS = '10'
+FS_WORKER_PROCESSES = '2'
+APP_WORKERS = '1'
+ARTIFACT_STORAGE_BACKEND = 'local_fs'
+POSTGRES_HOST = 'your-fs-demo-pg.internal'
+POSTGRES_DB = 'flow_steward'
+POSTGRES_USER = 'flow_steward'
+RABBITMQ_HOST = 'your-fs-demo-rabbit.internal'
+RABBITMQ_USER = 'flow_steward'
+FS_PUBLIC_BASE_URL = 'https://your-fs-demo-compact.fly.dev'
+FS_AUTH_TRUSTED_ORIGINS = 'https://your-fs-demo-compact.fly.dev'
+
+[[mounts]]
+source = 'compact_data'
+destination = '/data'
+
+[[vm]]
+cpu_kind = 'performance'
+cpus = 2
+memory = '4gb'
+
+[[restart]]
+policy = 'on-failure'
+retries = 3
+
+[http_service]
+internal_port = 8080
+force_https = true
+auto_stop_machines = 'off'
+auto_start_machines = false
+min_machines_running = 1
+
+[[http_service.checks]]
+grace_period = '60s'
+interval = '15s'
+timeout = '5s'
+method = 'GET'
+path = '/health/ready'

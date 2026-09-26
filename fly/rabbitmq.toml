@@ -1,0 +1,31 @@
+app = 'your-fs-demo-rabbit'
+primary_region = 'fra'
+kill_signal = 'SIGTERM'
+kill_timeout = 60
+
+[build]
+image = 'rabbitmq@sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69'
+
+[env]
+RABBITMQ_DEFAULT_USER = 'flow_steward'
+RABBITMQ_NODENAME = 'rabbit@localhost'
+
+[[mounts]]
+source = 'rabbitmq_data'
+destination = '/var/lib/rabbitmq'
+
+[[vm]]
+cpu_kind = 'shared'
+cpus = 1
+memory = '2gb'
+
+[[restart]]
+policy = 'on-failure'
+retries = 3
+
+[checks.rabbitmq]
+type = 'tcp'
+port = 5672
+grace_period = '60s'
+interval = '15s'
+timeout = '5s'
