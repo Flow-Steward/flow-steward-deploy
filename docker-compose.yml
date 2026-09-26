@@ -1,0 +1,66 @@
+# Deploy through the root elestio.yml template, which generates the credentials.
+# Proxy: HTTPS 443 -> HTTP 172.17.0.1:3000, path /.
+services:
+  postgres:
+    image: ghcr.io/vasily-piksis/fs-postgres-extended@sha256:47a10afb648b55a29e0422f7944a5eb8f12f99f4fecfbb5a2af721fe42196ce8
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: flow_steward
+      POSTGRES_USER: flow_steward
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U flow_steward -d flow_steward"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  rabbitmq:
+    image: rabbitmq@sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69
+    hostname: rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: flow_steward
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "bash", "-c", "</dev/tcp/127.0.0.1/5672"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  compact:
+    image: ghcr.io/vasily-piksis/flow-steward-compact@sha256:e41f179da299904b02cd60cb8b50d73e20f7fcf9f384a5bbc8edd17c8bfcf214
+    restart: unless-stopped
+    stop_grace_period: 180s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "172.17.0.1:3000:8080"
+    environment:
+      PORT: "8080"
+      ENVIRONMENT: production
+      FS_STACK_ENVIRONMENT: production
+      FS_WORKER_PROCESSES: "2"
+      APP_WORKERS: "1"
+      ARTIFACT_STORAGE_BACKEND: local_fs
+      FS_COMPACT_WAIT_FOR_DEPENDENCIES: "1"
+      FS_COMPACT_STARTUP_TIMEOUT_SECONDS: "600"
+      POSTGRES_DB: flow_steward
+      POSTGRES_USER: flow_steward
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      RABBITMQ_USER: flow_steward
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PASS: ${RABBITMQ_PASSWORD}
+      FS_PUBLIC_BASE_URL: ${FS_PUBLIC_BASE_URL}
+      FS_AUTH_TRUSTED_ORIGINS: ${FS_PUBLIC_BASE_URL}
+    volumes:
+      - compact-data:/data
+volumes:
+  postgres-data:
+  rabbitmq-data:
+  compact-data:

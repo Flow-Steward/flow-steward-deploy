@@ -1,0 +1,31 @@
+# Elestio reads this template when importing this public configuration repository.
+# Images are prebuilt; no access to the private application source is required.
+config:
+  runTime: dockerCompose
+  version: ""
+  framework: ""
+  installCommand: ""
+  buildCommand: docker-compose pull
+  buildDir: /
+  runCommand: docker-compose up -d
+  isMonoRepoPackageInRoot: false
+environments:
+  - key: POSTGRES_PASSWORD
+    value: random_password
+  - key: RABBITMQ_PASSWORD
+    value: random_password
+  - key: FS_PUBLIC_BASE_URL
+    value: https://[CI_CD_DOMAIN]
+ports:
+  - protocol: HTTPS
+    targetProtocol: HTTP
+    listeningPort: "443"
+    targetPort: "3000"
+    targetIP: 172.17.0.1
+    public: true
+    path: /
+    isAuth: false
+webUI:
+  - url: https://[CI_CD_DOMAIN]
+    label: Flow Steward
+monoRepoWorkSpaces: []
