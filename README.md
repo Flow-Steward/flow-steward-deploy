@@ -4,16 +4,19 @@ This repository contains Render, Elestio and Fly.io configuration for fresh Flow
 
 ## Fly.io
 
-The [Fly.io installation guide](fly/README.md) includes three TOML files for
-Compact, PostgreSQL and RabbitMQ, sequential startup commands, persistent
-volumes, HTTPS, and access to the built-in administrative CLI. Use a paid
-account for a persistent installation; trial Machines stop after five minutes.
+The [Fly.io installation guide](fly/README.md) includes three TOML files and a
+guided fresh installer. After installing the official Fly CLI and its listed
+helper tools, run `bash fly/install.sh`. It asks for placement, generates
+credentials, checks PostgreSQL and RabbitMQ before starting Compact, and
+prints the public URL and first-administrator handoff. The manual commands
+remain available. Use a paid account for a persistent installation; trial
+Machines stop after five minutes.
 
 ## Render
 
 Render creates one Compact web service, a private PostgreSQL service with the required extensions, a private RabbitMQ service, and their persistent disks. The services are paid; review Render's estimate before deploying. The application waits for PostgreSQL and RabbitMQ to accept connections before initialization.
 
-Fresh Blueprint installation was checked on Render on 2026-09-26: readiness,
+Fresh Blueprint installation was checked on Render on 2026-09-28: readiness,
 first-administrator setup, browser login, CLI administration, graceful shutdown,
 and user/session/file persistence after restart. The same Compact image also
 passed a fresh Railway installation and restart check.
@@ -102,9 +105,9 @@ not a zero-downtime cluster. GitHub webhook pushes can trigger redeployment;
 review changes before syncing your fork. Arrange and test backups before
 storing real data. Delete disposable test pipelines and VMs after testing.
 
-Fresh GitHub-template acceptance on 2026-09-26 covered generated credentials,
+Fresh GitHub-template acceptance on 2026-09-28 covered generated credentials,
 HTTPS readiness, first-administrator creation, browser login, CLI commands,
 graceful shutdown and user/session/file/runtime-key persistence after restart.
 AI-provider execution and full backup/restore were not included. The tested
-Compact source was `367d5ff885a5b7557cdb0fb712fe754539fa4d09`, pinned to
+Compact source was `31652e30e9c65b16576e9a4b3d105072c24b8337`, pinned to
 `sha256:dee794207e38a4828cadd659cb41cbeaf65a1bdfedd6e4532bcb2a89c77681b1`.

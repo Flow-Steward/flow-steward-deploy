@@ -9,6 +9,13 @@ not an upgrade tool or a high-availability database configuration. Keep all
 three apps in the same Fly organization and region. Only Compact has public
 ports. PostgreSQL and RabbitMQ use Fly's private IPv6 network.
 
+Fresh guided installation was verified on 2026-09-28 with Compact source
+`31652e30e9c65b16576e9a4b3d105072c24b8337`: generated credentials, sequential
+dependency readiness, first-administrator link, browser login, native CLI and
+user/session/file/key persistence after restart. The same common image is
+pinned in the other provider examples. This does not certify AI execution,
+high availability or backup/restore.
+
 ## Prepare
 
 Install [flyctl](https://fly.io/docs/flyctl/install/) and run `fly auth login`.
@@ -28,7 +35,20 @@ Clone this public configuration repository; application source is not needed:
 ```sh
 git clone https://github.com/Flow-Steward/flow-steward-deploy.git
 cd flow-steward-deploy
+bash fly/install.sh
 ```
+
+The guided script needs Fly CLI, jq, openssl and curl. It signs in when needed
+and asks for the billing organization (when there are several), an installation
+name and region. It creates the apps, volumes, generated credentials and IPs,
+then checks PostgreSQL and RabbitMQ before deploying Compact. Existing app
+names are refused. The final output prints the public URL and private setup
+link when available. Generated, password-free configs remain in
+`fly/generated/<name>/`. A failed installation prints exact cleanup commands;
+it leaves created resources in place, and they remain billable until removed.
+
+The following is the equivalent manual installation, for operators who want
+to inspect or control each step. Do not run it after the guided installation.
 
 Choose a globally unique prefix, such as `mycompany-fs`, and replace
 `your-fs-demo` in all three TOMLs with it. Set `primary_region` consistently
@@ -104,7 +124,7 @@ without it shows a token field. Alternatively, create the administrator from
 the running Machine, with email/password entered interactively:
 
 ```sh
-fly ssh console -a "$FS_FLY_PREFIX-compact" --pty -C 'flow-steward users create --role admin'
+fly ssh console -a "$FS_FLY_PREFIX-compact" --pty -C 'flow-steward users create --role admin --plain'
 ```
 
 Then open `https://<prefix>-compact.fly.dev` and sign in. Commands are on
@@ -132,6 +152,11 @@ Machines API in testing. A single-instance restart interrupts availability.
 Keep PostgreSQL and RabbitMQ running while Compact drains. For planned
 maintenance, stop Compact before stopping dependencies; start dependencies
 and check them before starting Compact again.
+
+On the fresh 2026-09-28 check, restart needed about six minutes for public
+readiness. Fly's restart command timed out first, but the same Machine later
+recovered with users, session, file and keys preserved. Confirm public
+`/health/ready` and `flow-steward status` before reopening the application.
 
 Arrange and test backups of all three stores before using real data. Volume
 snapshots alone do not prove a consistent PostgreSQL/RabbitMQ backup.
