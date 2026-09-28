@@ -30,7 +30,7 @@ services:
       timeout: 5s
       retries: 60
   compact:
-    image: ghcr.io/vasily-piksis/flow-steward-compact@sha256:e41f179da299904b02cd60cb8b50d73e20f7fcf9f384a5bbc8edd17c8bfcf214
+    image: ghcr.io/vasily-piksis/flow-steward-compact@sha256:dee794207e38a4828cadd659cb41cbeaf65a1bdfedd6e4532bcb2a89c77681b1
     restart: unless-stopped
     stop_grace_period: 180s
     depends_on:

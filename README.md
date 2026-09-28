@@ -107,4 +107,4 @@ HTTPS readiness, first-administrator creation, browser login, CLI commands,
 graceful shutdown and user/session/file/runtime-key persistence after restart.
 AI-provider execution and full backup/restore were not included. The tested
 Compact source was `367d5ff885a5b7557cdb0fb712fe754539fa4d09`, pinned to
-`sha256:e41f179da299904b02cd60cb8b50d73e20f7fcf9f384a5bbc8edd17c8bfcf214`.
+`sha256:dee794207e38a4828cadd659cb41cbeaf65a1bdfedd6e4532bcb2a89c77681b1`.
