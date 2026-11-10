@@ -2,7 +2,7 @@
 # Proxy: HTTPS 443 -> HTTP 172.17.0.1:3000, path /.
 services:
   postgres:
-    image: ghcr.io/vasily-piksis/fs-postgres-extended@sha256:47a10afb648b55a29e0422f7944a5eb8f12f99f4fecfbb5a2af721fe42196ce8
+    image: ghcr.io/flow-steward/flow-steward-postgres@sha256:1904c420b22fc6554f145ef5904404e5f907ea81d85fa500e9cbde96a71e495e
     restart: unless-stopped
     environment:
       POSTGRES_DB: flow_steward
@@ -19,6 +19,12 @@ services:
     image: rabbitmq@sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69
     hostname: rabbitmq
     restart: unless-stopped
+    # Compact's compose-local transport allows plaintext AMQP only to rabbitmq-fs:5672
+    # on this Compose network. Never publish the broker port.
+    networks:
+      default:
+        aliases:
+          - rabbitmq-fs
     environment:
       RABBITMQ_DEFAULT_USER: flow_steward
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
@@ -30,7 +36,7 @@ services:
       timeout: 5s
       retries: 60
   compact:
-    image: ghcr.io/vasily-piksis/flow-steward-compact@sha256:dee794207e38a4828cadd659cb41cbeaf65a1bdfedd6e4532bcb2a89c77681b1
+    image: ghcr.io/flow-steward/flow-steward-compact@sha256:df980396aacc3b80da0387d1bd63702aa4bbe78b4a1eec5a06e0a84c8a4deb31
     restart: unless-stopped
     stop_grace_period: 180s
     depends_on:
@@ -54,7 +60,8 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       RABBITMQ_USER: flow_steward
-      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_HOST: rabbitmq-fs
+      FS_RABBITMQ_TRANSPORT_MODE: compose-local
       RABBITMQ_PASS: ${RABBITMQ_PASSWORD}
       FS_PUBLIC_BASE_URL: ${FS_PUBLIC_BASE_URL}
       FS_AUTH_TRUSTED_ORIGINS: ${FS_PUBLIC_BASE_URL}
