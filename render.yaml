@@ -8,7 +8,7 @@ services:
     region: frankfurt
     plan: 1c-2g
     image:
-      url: ghcr.io/vasily-piksis/fs-postgres-extended@sha256:47a10afb648b55a29e0422f7944a5eb8f12f99f4fecfbb5a2af721fe42196ce8
+      url: ghcr.io/flow-steward/flow-steward-postgres@sha256:b403e8d9dc6fbcbdd4092e49017c96e6525f0ea204b7fbb27d709f9d899b353a
     disk:
       name: postgres-data
       mountPath: /var/lib/postgresql/data
@@ -46,7 +46,7 @@ services:
     region: frankfurt
     plan: 2c-4g
     image:
-      url: ghcr.io/vasily-piksis/flow-steward-compact@sha256:dee794207e38a4828cadd659cb41cbeaf65a1bdfedd6e4532bcb2a89c77681b1
+      url: ghcr.io/flow-steward/flow-steward-compact@sha256:f443bcb024be6f0fdb221f6105068503f3385988145642affe7b4d88c2acd220
     healthCheckPath: /health/ready
     # A user's one-click installation must not redeploy on every upstream push.
     autoDeployTrigger: 'off'
@@ -97,6 +97,14 @@ services:
       - key: RABBITMQ_USER
         value: flow_steward
       - key: RABBITMQ_HOST
+        fromService:
+          name: flow-steward-rabbitmq
+          type: pserv
+          property: host
+      # Plaintext AMQP only to the RabbitMQ service's private host (ADR 0064).
+      - key: FS_RABBITMQ_TRANSPORT_MODE
+        value: platform-private
+      - key: FS_RABBITMQ_PRIVATE_HOST
         fromService:
           name: flow-steward-rabbitmq
           type: pserv

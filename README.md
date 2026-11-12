@@ -1,6 +1,17 @@
 # Flow Steward deployment configuration
 
-This repository contains Render, Elestio and Fly.io configuration for fresh Flow Steward Compact installations. All pull from the same public [Flow Steward Compact image repository](https://github.com/vasily-piksis/agentic-team/pkgs/container/flow-steward-compact), pinned to a tested digest. They do not build or fork the application image.
+This repository contains Render, Elestio and Fly.io configuration for fresh Flow Steward Compact installations. All pull the public Flow Steward 0.9.15 release images from `ghcr.io/flow-steward`, pinned by digest.
+
+Flow Steward refuses unencrypted AMQP unless the deployment declares its broker.
+Render and Fly.io reach RabbitMQ over the provider's private network, so their
+Compact settings declare that one host with
+`FS_RABBITMQ_TRANSPORT_MODE=platform-private` and `FS_RABBITMQ_PRIVATE_HOST`
+(ADR 0064 in the application repository); the pinned 0.9.15 Compact image
+supports the mode. Elestio runs one Compose network on one VM and
+uses the Docker installation's `compose-local` context with the broker alias
+`rabbitmq-fs`. See the
+[RabbitMQ transport reference](https://docs.flowsteward.org/reference/environment-variables#rabbitmq-transport)
+for who shares each provider's private network. They do not build or fork the application image.
 
 ## Fly.io
 

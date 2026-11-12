@@ -92,6 +92,9 @@ if kill -0 "$(cat "$fixture/reader-pid")" 2>/dev/null; then
 fi
 [[ -z $(find "$fixture/private" -type f -print -quit) ]]
 grep -q "POSTGRES_HOST = 'test-fs-pg.internal'" "$fixture/config/generated/test-fs/compact.toml"
+grep -q "FS_RABBITMQ_TRANSPORT_MODE = 'platform-private'" "$fixture/config/generated/test-fs/compact.toml"
+grep -q "FS_RABBITMQ_PRIVATE_HOST = 'test-fs-rabbit.internal'" "$fixture/config/generated/test-fs/compact.toml"
+grep -q "RABBITMQ_HOST = 'test-fs-rabbit.internal'" "$fixture/config/generated/test-fs/compact.toml"
 if grep -q 'PASSWORD\|RABBITMQ_PASS' "$fixture/config/generated/test-fs/"*.toml; then
   printf 'Generated configs contain credentials\n' >&2; exit 1
 fi

@@ -4,7 +4,7 @@ kill_signal = 'SIGTERM'
 kill_timeout = 180
 
 [build]
-image = 'ghcr.io/vasily-piksis/flow-steward-compact@sha256:dee794207e38a4828cadd659cb41cbeaf65a1bdfedd6e4532bcb2a89c77681b1'
+image = 'ghcr.io/flow-steward/flow-steward-compact@sha256:f443bcb024be6f0fdb221f6105068503f3385988145642affe7b4d88c2acd220'
 
 [env]
 PORT = '8080'
@@ -23,6 +23,9 @@ POSTGRES_DB = 'flow_steward'
 POSTGRES_USER = 'flow_steward'
 RABBITMQ_HOST = 'your-fs-demo-rabbit.internal'
 RABBITMQ_USER = 'flow_steward'
+# Plaintext AMQP only to this one host on Fly's private network (ADR 0064).
+FS_RABBITMQ_TRANSPORT_MODE = 'platform-private'
+FS_RABBITMQ_PRIVATE_HOST = 'your-fs-demo-rabbit.internal'
 FS_PUBLIC_BASE_URL = 'https://your-fs-demo-compact.fly.dev'
 FS_AUTH_TRUSTED_ORIGINS = 'https://your-fs-demo-compact.fly.dev'
 
