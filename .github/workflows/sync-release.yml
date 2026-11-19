@@ -1,0 +1,52 @@
+name: Sync release pins
+# Keeps release.env and every provider pin on the latest published Flow Steward
+# release. Hourly polling needs no credentials in the application repository;
+# a release can also notify this workflow at once with repository_dispatch.
+on:
+  schedule:
+    - cron: '17 * * * *'
+  repository_dispatch:
+    types: [flow-steward-release]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release to pin (X.Y.Z). Empty: the latest published release.'
+        required: false
+permissions:
+  contents: write
+concurrency:
+  group: sync-release
+  cancel-in-progress: false
+jobs:
+  sync:
+    if: github.repository == 'Flow-Steward/flow-steward-deploy'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 (Node 24)
+        with:
+          ref: main
+      - name: Pin the release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REQUESTED_VERSION: ${{ inputs.version || github.event.client_payload.version }}
+        run: |
+          if [[ -n "$REQUESTED_VERSION" ]]; then
+            python3 scripts/sync-release.py --version "$REQUESTED_VERSION"
+          else
+            python3 scripts/sync-release.py
+          fi
+      - name: Verify
+        run: bash tests/run.sh
+      - name: Commit the new pins
+        run: |
+          if git diff --quiet; then
+            echo 'Pins already match the release.'
+            exit 0
+          fi
+          release=$(sed -n 's/^FLOW_STEWARD_RELEASE=//p' release.env)
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898283+github-actions[bot]@users.noreply.github.com'
+          git commit --all --message "chore: pin Flow Steward $release release images"
+          git push origin HEAD:main
+          echo "Pinned Flow Steward $release." >> "$GITHUB_STEP_SUMMARY"
