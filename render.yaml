@@ -8,7 +8,7 @@ services:
     region: frankfurt
     plan: 1c-2g
     image:
-      url: ghcr.io/flow-steward/flow-steward-postgres@sha256:b403e8d9dc6fbcbdd4092e49017c96e6525f0ea204b7fbb27d709f9d899b353a
+      url: ghcr.io/flow-steward/flow-steward-postgres@sha256:ed78b81e94beb243e6a8f71ab821d2bc41d1476ccb544d015f3dd3ebc5da62be
     disk:
       name: postgres-data
       mountPath: /var/lib/postgresql/data
@@ -46,7 +46,7 @@ services:
     region: frankfurt
     plan: 2c-4g
     image:
-      url: ghcr.io/flow-steward/flow-steward-compact@sha256:f443bcb024be6f0fdb221f6105068503f3385988145642affe7b4d88c2acd220
+      url: ghcr.io/flow-steward/flow-steward-compact@sha256:71437f5433d304546052a5a865545089253ad3b28a9e454da9f52bba243b2b39
     healthCheckPath: /health/ready
     # A user's one-click installation must not redeploy on every upstream push.
     autoDeployTrigger: 'off'
