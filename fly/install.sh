@@ -68,7 +68,7 @@ for role in postgres rabbitmq compact; do
 done
 created_apps=()
 created_count=0
-startup_log=
+startup_capture=
 log_reader=
 finish() {
   code=$?
@@ -77,7 +77,7 @@ finish() {
     kill "$log_reader" 2>/dev/null || true
     wait "$log_reader" 2>/dev/null || true
   fi
-  if [[ -n "$startup_log" ]]; then rm -f "$startup_log" "$startup_log.errors"; fi
+  if [[ -n "$startup_capture" ]]; then rm -rf -- "$startup_capture"; fi
   if (( code != 0 && created_count > 0 )); then
     printf '\nInstallation did not finish. Created resources remain billable. Inspect their logs or delete this disposable installation with:\n' >&2
     for app in "${created_apps[@]}"; do printf '  fly apps destroy %s\n' "$app" >&2; done
@@ -114,9 +114,9 @@ unset postgres_password rabbitmq_password
 # Subscribe before the first Compact Machine starts; keep the capture private
 # and delete it on both success and failure.
 umask 077
-startup_log=$(mktemp)
-chmod 600 "$startup_log"
-"$fly_command" logs -a "$prefix-compact" --json > "$startup_log" 2> "$startup_log.errors" &
+startup_capture=$(mktemp -d)
+startup_log="$startup_capture/startup.json"
+"$fly_command" logs -a "$prefix-compact" --json > "$startup_log" 2> "$startup_capture/stderr.log" &
 log_reader=$!
 "$fly_command" deploy -c "$config_dir/compact.toml" --ha=false --yes --wait-timeout 10m
 public_url="https://$prefix-compact.fly.dev"

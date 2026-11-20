@@ -28,6 +28,12 @@ case "$1 $2" in
     fi
     if [[ "$1" = logs ]]; then
       [[ "$*" != *--no-tail* ]] || exit 0
+      capture=$(find "$TMPDIR" -mindepth 1 -maxdepth 1 -type d -perm 0700 -print)
+      if [[ -z "$capture" ]] ||
+          [[ $(find "$capture" -maxdepth 1 -type f -perm 0600 | wc -l) -ne 2 ]]; then
+        printf 'Fly log streams were not captured in a private directory.\n' >&2
+        exit 1
+      fi
       printf '%s\n' "$$" > "$FIXTURE/reader-pid"
       trap 'exit 0' TERM
       printf '{\n  "message": "https://test-fs-compact.fly.dev/bootstrap#setup-token=test-only"\n}\n'
@@ -74,7 +80,7 @@ if [[ -f "$fixture/reader-pid" ]]; then
     printf 'Failed install left its log reader alive\n' >&2; exit 1
   fi
 fi
-[[ -z $(find "$fixture/private" -type f -print -quit) ]]
+[[ -z $(find "$fixture/private" -mindepth 1 -print -quit) ]]
 rm -rf "$fixture/config/generated"
 
 # Fresh installation succeeds without passwords or manual environment inputs.
@@ -90,7 +96,7 @@ grep -q 'https://test-fs-compact.fly.dev/bootstrap#setup-token=test-only' "$fixt
 if kill -0 "$(cat "$fixture/reader-pid")" 2>/dev/null; then
   printf 'Successful install left its log reader alive\n' >&2; exit 1
 fi
-[[ -z $(find "$fixture/private" -type f -print -quit) ]]
+[[ -z $(find "$fixture/private" -mindepth 1 -print -quit) ]]
 grep -q "POSTGRES_HOST = 'test-fs-pg.internal'" "$fixture/config/generated/test-fs/compact.toml"
 grep -q "FS_RABBITMQ_TRANSPORT_MODE = 'platform-private'" "$fixture/config/generated/test-fs/compact.toml"
 grep -q "FS_RABBITMQ_PRIVATE_HOST = 'test-fs-rabbit.internal'" "$fixture/config/generated/test-fs/compact.toml"
