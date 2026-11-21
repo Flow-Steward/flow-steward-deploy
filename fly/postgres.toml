@@ -4,7 +4,7 @@ kill_signal = 'SIGINT'
 kill_timeout = 60
 
 [build]
-image = 'ghcr.io/flow-steward/flow-steward-postgres@sha256:a02fc0e55781b6505acc15f653c6ec59180634759d6c54df50bc6afa200e2516'
+image = 'ghcr.io/flow-steward/flow-steward-postgres@sha256:77fbb982016aeebe31b89f3cde526a60238b35644bfdab0ba4f0831ef25fd0c3'
 
 [env]
 PGDATA = '/var/lib/postgresql/data/pgdata'
