@@ -2,7 +2,7 @@
 # Proxy: HTTPS 443 -> HTTP 172.17.0.1:3000, path /.
 services:
   postgres:
-    image: ghcr.io/flow-steward/flow-steward-postgres@sha256:c25ce0bc54d546069e6073853afe0143242ef11cf7e901e11e282f474f63e6c1
+    image: ghcr.io/flow-steward/flow-steward-postgres@sha256:971e05f17a02292fd1e53891a0ae2b45db1df03494d2bc426814556d91cff4ac
     restart: unless-stopped
     environment:
       POSTGRES_DB: flow_steward
@@ -36,7 +36,7 @@ services:
       timeout: 5s
       retries: 60
   compact:
-    image: ghcr.io/flow-steward/flow-steward-compact@sha256:5e50965ce1050aafba1cdf5b9ee8e5c244a32f783ddedd494834a18a6587efb1
+    image: ghcr.io/flow-steward/flow-steward-compact@sha256:b94cdbba46b8e4af98ec6591b8735cda6197d8da47f37d59f9be3f7d820b30d3
     restart: unless-stopped
     stop_grace_period: 180s
     depends_on:
